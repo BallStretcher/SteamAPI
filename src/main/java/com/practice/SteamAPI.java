@@ -8,10 +8,13 @@ import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.util.EntityUtils;
 import org.apache.http.HttpResponse;
 
+import java.io.IOException;
+
 public class SteamAPI{
-    static ObjectMapper mapper = new ObjectMapper();
     private static final String API_KEY = "CB76C482937B0AC695B62EBB16D3A64C";
     private static final String BASE_URL = "https://api.steampowered.com/";
+    private static final CloseableHttpClient client = HttpClientBuilder.create().build();
+    private static final ObjectMapper mapper = new ObjectMapper();
 
 
     public static void main(String[] args) {
@@ -25,37 +28,33 @@ public class SteamAPI{
 
         try
         {
-            CloseableHttpClient client = HttpClientBuilder.create().build();
-            HttpGet request = new HttpGet(url);
-            HttpResponse response = client.execute(request);
-            System.out.println("Ответ сервера - "+ response.getStatusLine().getStatusCode());
-            String responseBody = EntityUtils.toString(response.getEntity(), "UTF-8");
-            System.out.println(responseBody);
 
-
-
-
-
-            ObjectMapper mapper = new ObjectMapper();
-            JsonNode player = mapper.readTree(responseBody);
+            JsonNode player = mapper.readTree(nnn(url));
             return player.path("response").path("players").get(0);
         } catch (Exception e) {
             System.out.println("Connection failed");
         }
         return null;
     }
-    public static JsonNode getGamesInfo(String steamId){
-        String url = BASE_URL+"IPlayerService/GetOwnedGames/v0001/?key="+API_KEY+"&steamid="+steamId+"&include_appinfo=true&format=json";
+
+    private static String nnn(String url) {
         try {
-            CloseableHttpClient client = HttpClientBuilder.create().build();
             HttpGet request = new HttpGet(url);
             HttpResponse response = client.execute(request);
             System.out.println("Ответ сервера - " + response.getStatusLine().getStatusCode());
             String responseBody = EntityUtils.toString(response.getEntity(), "UTF-8");
             System.out.println(responseBody);
+            return responseBody;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
 
-
-            JsonNode games = mapper.readTree(responseBody);
+    public static JsonNode getGamesInfo(String steamId){
+        String url = BASE_URL+"IPlayerService/GetOwnedGames/v0001/?key="+API_KEY+"&steamid="+steamId+"&include_appinfo=true&format=json";
+        try {
+            JsonNode games = mapper.readTree(nnn(url));
 
             return games.path("response").path("games");
         }
@@ -66,13 +65,8 @@ public class SteamAPI{
     public static JsonNode getGameInfo(String steamId,Integer appID){
         String url = BASE_URL+ "ISteamUserStats/GetPlayerAchievements/v0001/?appid="+appID+"&key="+API_KEY+"&steamid="+steamId;
         try {
-            CloseableHttpClient client = HttpClientBuilder.create().build();
-            HttpGet request = new HttpGet(url);
-            HttpResponse response = client.execute(request);
-            System.out.println("Ответ сервера - " + response.getStatusLine().getStatusCode());
-            String responseBody = EntityUtils.toString(response.getEntity(), "UTF-8");
-            System.out.println(responseBody);
-            JsonNode games = mapper.readTree(responseBody);
+
+            JsonNode games = mapper.readTree(nnn(url));
             return games.path("response").path("games");
         }
         catch (Exception e) {}
