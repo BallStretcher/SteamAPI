@@ -8,8 +8,6 @@ import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.util.EntityUtils;
 import org.apache.http.HttpResponse;
 
-import java.io.IOException;
-
 public class SteamAPI{
     private static final String API_KEY = "CB76C482937B0AC695B62EBB16D3A64C";
     private static final String BASE_URL = "https://api.steampowered.com/";
@@ -21,23 +19,9 @@ public class SteamAPI{
         getGamesInfo("76561198145570899");
 
     }
-    public static JsonNode getProfileInfo(String steamId){
-        String url = BASE_URL + "ISteamUser/GetPlayerSummaries/v2/?key=" +
-                API_KEY + "&steamids=" + steamId;
 
 
-        try
-        {
-
-            JsonNode player = mapper.readTree(nnn(url));
-            return player.path("response").path("players").get(0);
-        } catch (Exception e) {
-            System.out.println("Connection failed");
-        }
-        return null;
-    }
-
-    private static String nnn(String url) {
+    private static String base(String url) {
         try {
             HttpGet request = new HttpGet(url);
             HttpResponse response = client.execute(request);
@@ -51,14 +35,28 @@ public class SteamAPI{
         return null;
     }
 
+    public static JsonNode getProfileInfo(String steamId){
+        String url = BASE_URL + "ISteamUser/GetPlayerSummaries/v2/?key=" +
+                API_KEY + "&steamids=" + steamId;
+        try
+        {
+            return mapper.readTree(base(url));
+            //player.path("response").path("players").get(0); в парсер
+        } catch (Exception e) {
+            System.out.println("Connection failed");
+        }
+        return null;
+    }
+
+
+
     public static JsonNode getGamesInfo(String steamId){
         String url = BASE_URL+"IPlayerService/GetOwnedGames/v0001/?key="+API_KEY+"&steamid="+steamId+"&include_appinfo=true&format=json";
         try {
-            JsonNode games = mapper.readTree(nnn(url));
-
-            return games.path("response").path("games");
+            return mapper.readTree(base(url));
+            //games.path("response").path("games"); в парсер
         }
-        catch (Exception e) {}
+        catch (Exception e) {System.out.println("Connection failed");}
 
         return null;
     }
@@ -66,7 +64,7 @@ public class SteamAPI{
         String url = BASE_URL+ "ISteamUserStats/GetPlayerAchievements/v0001/?appid="+appID+"&key="+API_KEY+"&steamid="+steamId;
         try {
 
-            JsonNode games = mapper.readTree(nnn(url));
+            JsonNode games = mapper.readTree(base(url));
             return games.path("response").path("games");
         }
         catch (Exception e) {}
