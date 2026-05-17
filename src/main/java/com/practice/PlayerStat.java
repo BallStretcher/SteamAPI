@@ -32,17 +32,14 @@ public class PlayerStat extends SteamAPI {
     }
 
 
-    public PlayerStat(String steamID)
+    public PlayerStat(String name,String avatar_link,int current_status,int last_seen,String game_playing)
     {
-        JsonNode stat = getProfileInfo(steamID);
+        this.name = name;
+        this.avatar_link = avatar_link;
+        this.current_status = status.get(current_status);
+        this.game_playing = (game_playing);
 
-
-        this.name = stat.path("personaname").asText("Имя не найдено");
-        this.avatar_link = stat.path("avatarfull").asText("not found");
-        this.current_status = status.get(stat.path("personastate").asInt());
-        this.game_playing = (stat.path("gameextrainfo").asText());
-
-        Instant instant = Instant.ofEpochSecond(stat.path("lastlogoff").asInt());
+        Instant instant = Instant.ofEpochSecond(last_seen);
         ZonedDateTime zonedDateTime = instant.atZone(ZoneId.systemDefault());
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss z");
         this.last_seen = zonedDateTime.format(formatter);
@@ -51,12 +48,12 @@ public class PlayerStat extends SteamAPI {
 
     public static void getAllInfo(PlayerStat player)
     {
-        getGamesInfo("76561198145570899");
         System.out.println(player.name);
         if(player.current_status.equals("Offline")) System.out.println(player.last_seen);
         else System.out.println(player.current_status);
         if(!player.game_playing.replaceAll(" ","").equals("")) System.out.println(player.game_playing);
     }
+
 
 
 }

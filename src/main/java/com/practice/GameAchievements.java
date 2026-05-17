@@ -1,6 +1,6 @@
 package com.practice;
 
-public class GameAchievements extends SteamAPI{
+public class GameAchievements{
 
 
 }
