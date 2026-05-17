@@ -27,7 +27,7 @@ public class SteamAPI{
             HttpResponse response = client.execute(request);
             System.out.println("Ответ сервера - " + response.getStatusLine().getStatusCode());
             String responseBody = EntityUtils.toString(response.getEntity(), "UTF-8");
-            System.out.println(responseBody);
+            System.out.println(responseBody+"\n"+new Object(){}.getClass().getEnclosingMethod().getName());
             return responseBody;
         } catch (Exception e) {
             e.printStackTrace();
